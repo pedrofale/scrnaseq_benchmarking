@@ -1,0 +1,11 @@
+numpy
+scipy
+matplotlib
+ipython
+jupyter
+pandas
+sympy
+nose
+seaborn
+scikit-learn
+tensorflow
