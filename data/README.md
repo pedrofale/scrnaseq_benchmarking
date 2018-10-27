@@ -5,6 +5,7 @@ Raw counts, group assignments and batch annotations were retrieved from the [_sc
 
 ## ZEISEL
 Raw counts and group assignments from [here](https://storage.googleapis.com/linnarsson-lab-www-blobs/blobs/cortex/expression_mRNA_17-Aug-2014.txt).
+Not available in this repository due to size constraints.
 
 ## PBMC
 Raw counts, group assignments and batch annotations retrieved using the scripts available [here](https://github.com/romain-lopez/scVI-reproducibility).
