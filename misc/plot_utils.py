@@ -145,7 +145,7 @@ def plot_model_convergence(model_list, mode='train_ll_time', ax=None, legend=Non
     plot_convergence_curves(curve_list, label_list=[model.name for model in model_list], 
         ax=ax, legend=legend, title=title, xlabel=xlabel, ylabel=ylabel, filename=filename)
 
-def plot_tsne(tsne, clusters, labels=None, ax=None, legend=None, markers=None, title='', xlabel='', ylabel='', s=30, alpha=0.7, filename=None):
+def plot_tsne(tsne, clusters, labels=None, ax=None, legend=None, markers=None, title='', xlabel='', ylabel='', s=30, alpha=0.5, bbox_to_anchor=[1., 1.], filename=None, ncol=None):
     if labels is not None:
         labels = np.array(labels)
     
@@ -160,11 +160,11 @@ def plot_tsne(tsne, clusters, labels=None, ax=None, legend=None, markers=None, t
             ax.scatter(tsne[clusters==c, 0], tsne[clusters==c, 1], s=s, alpha=alpha)
     
     if labels is not None and legend:
-        ax.legend()
+        ax.legend(bbox_to_anchor=bbox_to_anchor, frameon=True, fontsize=14, ncol=ncol)
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title(title)
+    plt.title(title, fontsize=14)
     if ax is None:
         if filename is not None:
             plt.savefig(filename, bbox_inches='tight')
@@ -402,6 +402,14 @@ def prepare_for_boxplots(model_list_cv):
         res['dropimp_err'] = {model_list[0].name: [model.dropimp_err for model in model_list] for model_list in model_list_cv}
     except:
         pass
+    try:
+        res['corr_1_ls'] = {model_list[0].name: [model.corr_1_ls for model in model_list] for model_list in model_list_cv}
+        res['corr_2_ls'] = {model_list[0].name: [model.corr_2_ls for model in model_list] for model_list in model_list_cv}
+
+        res['corr_1_dr'] = {model_list[0].name: [model.corr_1_dr for model in model_list] for model_list in model_list_cv}
+        res['corr_2_dr'] = {model_list[0].name: [model.corr_2_dr for model in model_list] for model_list in model_list_cv}
+    except:
+        pass
 
     return res
 
@@ -417,7 +425,25 @@ def clustering_barplot(model_list, ax=None, title=None, ylabel=None,
             basw = None
     except:
         basw = None
-    return _clustering_barplot(res['asw'], res['ari'], res['nmi'], basw, ax=ax, title=title, ylabel=ylabel, colors=colors, do_legend=do_legend, show_legend=show_legend, ylim=ylim)
+
+    try:
+        corr_1_ls = res['corr_1_ls']
+        corr_2_ls = res['corr_2_ls']
+        corr_1_dr = res['corr_1_dr']
+        corr_2_dr = res['corr_2_dr']
+        if corr_1_ls[0][0] == None:
+            corr_1_ls = None
+            corr_2_ls = None
+            corr_1_dr = None
+            corr_2_dr = None
+    except:
+        corr_1_ls = None
+        corr_2_ls = None
+        corr_1_dr = None
+        corr_2_dr = None
+
+    return _clustering_barplot(res['asw'], res['ari'], res['nmi'], basw, corrs=[corr_1_ls, corr_2_ls, corr_1_dr, corr_2_dr], 
+        ax=ax, title=title, ylabel=ylabel, colors=colors, do_legend=do_legend, show_legend=show_legend, ylim=ylim)
 
 def loglikelihood_barplot(model_list, ax=None, title=None, ylabel=None,
                             colors = ['blue', 'orange', 'green', 'red', 'yellow', 'purple', 'gray'], do_legend=True, show_legend=False, ylim=None, hatches=None):
@@ -428,7 +454,7 @@ def loglikelihood_barplot(model_list, ax=None, title=None, ylabel=None,
         ylim=ylim, hatches=hatches)
 
 
-def _clustering_barplot(asw, ari, nmi, basw=None, ax=None, title=None, ylabel=None,
+def _clustering_barplot(asw, ari, nmi, basw=None, corrs=None, ax=None, title=None, ylabel=None,
                             colors = ['blue', 'orange', 'green', 'red', 'yellow', 'purple', 'gray'], do_legend=True, show_legend=False, ylim=None):
     """
     asw, ari and nmi are, each one, a list containing the scores for each model across all runs.
@@ -576,11 +602,28 @@ def clustering_cv(model_list_cv, ax=None, title=None, ylabel=None,
     res = prepare_for_boxplots(model_list_cv)
     try:
         basw = res['basw']
-        if basw[0][0] == None:
+        if list(basw.values())[0][0] == None:
             basw = None
     except:
         basw = None
-    return _clustering_cv(res['asw'], res['ari'], res['nmi'], basw, ax=ax, title=title, ylabel=ylabel, colors=colors, do_legend=do_legend, 
+
+    try:
+        corr_1_ls = res['corr_1_ls']
+        corr_2_ls = res['corr_2_ls']
+        corr_1_dr = res['corr_1_dr']
+        corr_2_dr = res['corr_2_dr']
+        if list(corr_1_ls.values())[0][0] == None:
+            corr_1_ls = None
+            corr_2_ls = None
+            corr_1_dr = None
+            corr_2_dr = None
+    except:
+        corr_1_ls = None
+        corr_2_ls = None
+        corr_1_dr = None
+        corr_2_dr = None
+
+    return _clustering_cv(res['asw'], res['ari'], res['nmi'], basw, corrs=[corr_1_ls, corr_2_ls, corr_1_dr, corr_2_dr], ax=ax, title=title, ylabel=ylabel, colors=colors, do_legend=do_legend, 
         show_legend=show_legend, ylim=ylim, box=box, hatches=hatches)
 
 def loglikelihood_cv(model_list_cv, ax=None, title=None, ylabel=None,
@@ -601,7 +644,7 @@ def imputationerr_boxplot(model_list, ax=None, title=None, ylabel=None,
     return _dropimperr_boxplot(res['dropimp_err'], ax=ax, title=title, ylabel=ylabel, colors=colors, do_legend=do_legend, show_legend=show_legend, ylim=ylim, box=box, hatches=hatches)
 
 
-def _clustering_cv(asw, ari, nmi, basw=None, ax=None, title=None, ylabel=None,
+def _clustering_cv(asw, ari, nmi, basw=None, corrs=None, ax=None, title=None, ylabel=None,
                             colors = ['blue', 'red', 'green', 'orange', 'yellow'], do_legend=True, show_legend=False, ylim=None, box=False, hatches=None):
     """
     asw, ari and nmi are, each one, a list containing the scores for each model across all runs.
@@ -616,6 +659,20 @@ def _clustering_cv(asw, ari, nmi, basw=None, ax=None, title=None, ylabel=None,
         basw = list(basw.values())
         if basw[0] is not None:
             metrics = [asw, ari, nmi, basw]
+
+    if corrs is not None:
+        corr_1_ls = corrs[0]
+        corr_2_ls = corrs[1]
+        corr_1_dr = corrs[2]
+        corr_2_dr = corrs[3]
+        
+        corr_1_ls = list(corr_1_ls.values())
+        corr_2_ls = list(corr_2_ls.values())
+        corr_1_dr = list(corr_1_dr.values())
+        corr_2_dr = list(corr_2_dr.values())
+        if corr_1_ls[0] is not None:
+            metrics = [asw, corr_1_ls, corr_2_ls, corr_1_dr, corr_2_dr]
+
     ticks_pos = []
 
     n_boxes = len(asw)
@@ -682,10 +739,14 @@ def _clustering_cv(asw, ari, nmi, basw=None, ax=None, title=None, ylabel=None,
         plt.xlim(0, stop)
     else:
         plt.xlim(0, stop)
-    if basw is not None:
-        ax.set_xticklabels(['ASW', 'ARI', 'NMI', 'bASW'], fontsize=14)
+
+    if corrs is not None:
+        ax.set_xticklabels(['ASW', 'Corr1_LS', 'Corr2_LS', 'Corr1_DR', 'Corr2_DR'], fontsize=14)
     else:
-        ax.set_xticklabels(['ASW', 'ARI', 'NMI'], fontsize=14)
+        if basw is not None:
+            ax.set_xticklabels(['ASW', 'ARI', 'NMI', 'bASW'], fontsize=14)
+        else:
+            ax.set_xticklabels(['ASW', 'ARI', 'NMI'], fontsize=14)
     ax.set_xticks(ticks_pos)
 
     if ylim is not None:

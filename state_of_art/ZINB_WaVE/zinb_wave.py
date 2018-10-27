@@ -15,10 +15,12 @@ path = os.path.dirname(os.path.abspath(__file__))
 
 class ZINB_WaVE(BaseEstimator, TransformerMixin):
     
-    def __init__(self, n_components=10, learn_V=True):
+    def __init__(self, n_components=10, learn_V=True, batch_correction=False):
         self.n_components = n_components
         self.learn_V = learn_V
-        warnings.filterwarnings("ignore", category=RRuntimeWarning)
+        self.batch_correction = batch_correction
+
+        # warnings.filterwarnings("ignore", category=RRuntimeWarning)
         rpy2.robjects.numpy2ri.activate()
         ro.r["library"]("zinbwave")
         ro.r["library"]("BiocParallel")
@@ -29,7 +31,7 @@ class ZINB_WaVE(BaseEstimator, TransformerMixin):
         ro.r["library"]("biomaRt")
         ro.r["library"]("tibble")
         # ro.r["library"]("SIMLR")
-        ro.r("BiocParallel::register(BiocParallel::MulticoreParam(4))")
+        ro.r("BiocParallel::register(BiocParallel::MulticoreParam(10))")
         ro.r.assign("K", n_components)
         ro.r['source']('{}/zinboptimizeval.R'.format(path))
 

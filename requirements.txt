@@ -8,4 +8,6 @@ sympy
 nose
 seaborn
 scikit-learn
-tensorflow
+tensorflow==1.5.0
+edward==1.3.5
+rpy2
