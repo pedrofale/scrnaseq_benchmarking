@@ -5,6 +5,7 @@ from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics.cluster import normalized_mutual_info_score
 from sklearn.base import BaseEstimator
 import numpy as np
+from scipy.stats import pearsonr
 from misc import utils
 
 # class ModelWrapper(object):
@@ -108,7 +109,7 @@ class ModelWrapper(object):
 		self.test_ll = None
 		self.batch_asw = None
 
-	def run(self, max_iter=1, max_time=60, do_tsne=True, do_dll=True, do_holl=True, do_silh=True, do_batch=False, verbose=False):
+	def run(self, max_iter=1, max_time=60, do_tsne=True, do_dll=True, do_holl=True, do_silh=True, do_batch=False, do_corr=False, verbose=False):
 		if verbose:
 			print('Running {0}...'.format(self.name))
 
@@ -155,8 +156,8 @@ class ModelWrapper(object):
 
 				self.nmi = normalized_mutual_info_score(self.c_train, res)
 
-			if self.est_z.shape[1] > 2:
-				if do_tsne:
+			if do_tsne:
+				if self.est_z.shape[1] > 2:
 					self.do_tsne()
 			else:
 				self.proj_2d = self.est_z
@@ -193,6 +194,17 @@ class ModelWrapper(object):
 							self.test_ll = self.model_inst.score(self.X_test)
 					if self.log_data:
 						self.test_ll = self.test_ll - np.mean(np.sum(self.X_test, axis=-1))
+
+			if do_corr:
+				if self.est_z.shape[1] == 2:
+					self.library_size = np.sum(self.X_train, axis=1)
+					self.detection_rate = np.sum(self.X_train != 0, axis=1) / self.X_train.shape[1]
+
+					self.corr_1_ls = np.abs(pearsonr(self.est_z[:, 0], self.library_size)[0])
+					self.corr_1_dr = np.abs(pearsonr(self.est_z[:, 0], self.detection_rate)[0])
+					
+					self.corr_2_ls = np.abs(pearsonr(self.est_z[:, 1], self.library_size)[0])
+					self.corr_2_dr = np.abs(pearsonr(self.est_z[:, 1], self.detection_rate)[0])
 
 		if verbose:
 			print('Done.')
