@@ -8,9 +8,12 @@ Raw counts and group assignments from [here](https://storage.googleapis.com/linn
 
 ## PBMC
 Raw counts, group assignments and batch annotations retrieved using the scripts available [here](https://github.com/romain-lopez/scVI-reproducibility).
+Not available in this repository due to size constraints.
 
 ## RETINA
 Raw counts, group assignments and batch annotations retrieved using the [scvi Python package](https://scvi.readthedocs.io/en/master/).
+Not available in this repository due to size constraints.
 
 ## LARGE
 Data is loaded in the notebooks using the [scvi Python pacakge](https://scvi.readthedocs.io/en/master/).
+Not available in this repository due to size constraints.
