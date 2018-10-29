@@ -5,7 +5,7 @@ See the pre-print for details.
 
 
 ### Requirements
-Install via 'python setup.py install'.
+Install via ``python setup.py install``.
 
 Need to install [mpCMF](https://github.com/pedrofale/mpcmf) and [ZINBayes](https://github.com/pedrofale/zinbayes).
  
