@@ -5,7 +5,9 @@ See the pre-print for details.
 
 
 ### Requirements
-See `requirements.txt`.
+Install via 'python setup.py install'.
+
+Need to install [mpCMF](https://github.com/pedrofale/mpcmf) and [ZINBayes](https://github.com/pedrofale/zinbayes).
  
 R needs to be installed with [ZINB-WaVE](https://bioconductor.org/packages/release/bioc/html/zinbwave.html) and [pCMF](https://gitlab.inria.fr/gdurif/pCMF) packages.
 
